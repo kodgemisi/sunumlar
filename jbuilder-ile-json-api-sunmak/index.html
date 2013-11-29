@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>Jbuilder - Rails ve Jbuilder kullanarak JSON API sunmak || OWTG 2013</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/night.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h2>Rails ve Jbuilder kullanarak JSON API sunmak</h2>
+					<!--<h4>Bir DSL olarak Jbuilder</h4>-->
+					<p>
+						<small><a href="http://blog.yorgunpenguen.com">Zafer Cakmak</a> / <a href="http://twitter.com/xaphtrick">@xaphtrick</a></small>
+					</p>
+				</section>
+
+       <section>
+          <h2>Kim bu adam?</h2>
+          <p>
+            <a href="http://www.kodgemisi.com">KodGemisi'nin Tayfası</a><br>
+            <p>
+              Özgür Yazılım Destekçisi
+            </p>
+          </p>
+          <div id="kodgemisi-logo">
+            <img src="kodgemisi.png" alt="kodgemisi" style="background: none !important; border:none !important;">
+          </div>
+        </section>
+
+				<section>
+					<h2>Neler Anlatacağım?</h2>
+					<ul>
+						<li>Yeni başlayanlar için API</li>
+						<li>Rails ile JSON API sunmak</li>
+						<li>Problemler</li>
+						<li>Çözüm: Jbuilder</li>
+						<li>Jbuilder kullanım örnekleri</li>
+						<li>Soru & Cevap</li>
+					</ul>
+				</section>
+
+				<section>
+          <section>
+            <h2>Yeni başlayanlar için API</h2>
+            <p>
+              API: Programlanabilir arabirim
+            </p>
+            <p class="fragment">
+              JSON, XML formatında veri taşır
+            </p>
+          </section>
+				</section>
+
+				<section>
+          <section>
+            <h2>Rails ile JSON API sunmak</h2>
+            <p class="fragment">
+              Objenin JSON dumpini almak
+            </p>
+            <p class="fragment">
+              Oldukça basit
+            </p>
+          </section>
+          <section>
+            <p>users_controller.rb</p>
+            <pre><code data-trim>
+def index
+  @users = User.all          
+
+  respond_to do |format|     
+    format.json { render json: @users }
+  end
+end
+            </code></pre>
+            <p>/users/index.json</p>
+            <pre><code data-trim>
+[
+  {
+    "address": "karsiyaka",
+    "created_at": "2013-11-22T01:17:36Z",
+    "email": "zafer@kodgemisi.com",
+    "first_name": "zafer",
+    "id": 1,
+    "last_name": "cakmak",
+    "updated_at": "2013-11-22T01:17:36Z"
+  },
+  {
+    "address": "karsiyaka",
+    "created_at": "2013-11-22T01:17:36Z",
+    "email": "destan@kodgemisi.com",
+    "first_name": "destan",
+    "id": 2,
+    "last_name": "sarpkaya",
+    "updated_at": "2013-11-22T01:17:36Z"
+  }
+]
+            </code></pre>
+          </section>
+          <section>
+            <p>users_controller.rb</p>
+            <pre><code data-trim>
+def show                     
+  @user = User.find(params[:id])  
+
+  respond_to do |format|     
+    format.json { render json: @user }
+  end
+end
+            </code></pre>
+            <p>/users/index/1.json</p>
+            <pre><code data-trim>
+{
+  "address": "karsiyaka",
+  "created_at": "2013-11-22T01:17:36Z",
+  "email": "zafer@kodgemisi.com",
+  "first_name": "zafer",
+  "id": 1,
+  "last_name": "cakmak",
+  "updated_at": "2013-11-22T01:17:36Z"
+}
+            </code></pre>
+          </section>
+				</section>
+				<section>
+					<h2>Problemler</h2>
+            <li class="fragment">Tekrar kullanabilme</li>
+            <li class="fragment">Okunabilirlik</li>
+          </ol>
+				</section>
+
+				<section>
+          <section>
+            <h3>1. Özelleştirme</h3>
+          </section>
+          <section>
+            <p>/users/index/1.json</p>
+            <pre><code data-trim>
+{
+  "address": "karsiyaka",
+  "created_at": "2013-11-22T01:17:36Z",
+  "email": "zafer@kodgemisi.com",
+  "first_name": "zafer",
+  "id": 1,
+  "last_name": "cakmak",
+  "updated_at": "2013-11-22T01:17:36Z"
+}
+            </code></pre>
+          </section>
+          <section>
+            <p>users_controller.rb</p>
+            <pre><code data-trim>
+def show                     
+  @user = User.find(params[:id])  
+
+  respond_to do |format|     
+    format.json { render json: @user.as_json(only: [:first_name, :last_name, :email]) }
+  end
+end
+            </code></pre>
+          </section>
+          <section>
+            <p>/users/index/1.json</p>
+            <pre><code data-trim>
+{
+  "email": "zafer@kodgemisi.com",
+  "first_name": "zafer",
+  "last_name": "cakmak",
+}
+            </code></pre>
+          </section>
+          <section>
+            <p>user.rb</p>
+            <pre><code data-trim>
+def name
+  "#{self.first_name} #{self.last_name}"
+end
+            </code></pre>
+            <p>controller</p>
+            <pre><code data-trim>
+...
+render json: @user.as_json(only: [:email], methods: [:name])
+...
+            </code></pre>
+            <p>/users/index/1.json</p>
+            <pre><code data-trim>
+{
+  "email": "zafer@kodgemisi.com",
+  "name": "zafer cakmak",
+}
+            </code></pre>
+          </section>
+          <section>
+            <p>controller</p>
+            <pre><code data-trim>
+...
+render json: @user.as_json(
+  only: [:email], 
+  methods: [:name], 
+  include: {
+    posts: {
+      only: [:title],
+      include: {
+        comments: {
+          only: [:content] 
+        }
+      } 
+    }
+  }
+)
+...
+            </code></pre>
+            <p>/users/index/1.json</p>
+            <pre><code data-trim>
+{
+  "email": "zafer@kodgemisi.com",
+  "name": "zafer cakmak",
+  "posts": [
+    {
+      "title": "deneme", 
+      "comments": [ {"content": "bu bir yorum icerigidir"} ] 
+    }
+  ]
+}
+            </code></pre>
+          </section>
+				</section>
+
+				<section>
+          <h3>2. Tekrar kullanabilme</h3>
+          <p class="fragment">Nerede lazımsa tekrar yaz</p>
+          <p class="fragment">as_json için hash tut onu kullan</p>
+				</section>
+
+				<section>
+          <h3>3. Okunabilirlik</h3>
+          <p class="fragment">Nested yapı sorunlu</p>
+          <p class="fragment">Logic yok</p>
+				</section>
+
+				<section>
+					<h2>Çözüm: Jbuilder</h2>
+					<p class="fragment">
+            JSON structure oluşturmak için bir DSL
+					</p>
+				</section>
+        <section>
+					<h2>Jbuilder</h2>
+          <p class="fragment">
+            Presentation logic i view tarafında tutar
+          </p>
+					<p class="fragment">
+            Rails4 standartı. Alternatif: RABL, JsonBuilder
+					</p>
+        </section>
+        <section>
+					<h2>Jbuilder</h2>
+					<p class="fragment">
+            Okunabilir, anlaşılabilir, yönetilebilir kod
+					</p>
+					<p class="fragment">
+            Partial desteği
+					</p>
+					<p class="fragment">
+            View cache
+					</p>
+        </section>
+
+				<section>
+          <h2>Jbuilder kullanım örnekleri</h2>
+          <p>users_controller.rb</p>
+					<pre><code data-trim contenteditable>
+def index                    
+  @users = User.all          
+end
+
+def show
+  @user = User.find(params[:id])
+end
+					</code></pre>
+          <p>views/users/show.json.jbuilder</p>
+					<pre><code data-trim contenteditable>
+json.extract! @user, :first_name, :last_name, :email, :address, :birth_date, :created_at, :updated_at
+					</code></pre>
+          <p>views/users/index.json.jbuilder</p>
+					<pre><code data-trim contenteditable>
+
+json.array!(@users) do |user|
+  json.extract! user, :first_name, :last_name, :email, :address, :birth_date
+end
+
+					</code></pre>
+				</section>
+
+				<section>
+          <h2>Jbuilder kullanım örnekleri</h2>
+          <p>views/users/show.json.jbuilder</p>
+					<pre><code data-trim contenteditable>
+json.name "#{@user.first_name} #{user.last_name}"
+json.email @user.email
+					</code></pre>
+					<pre><code data-trim contenteditable>
+{
+  "email": "zafer@kodgemisi.com",
+  "name": "zafer cakmak",
+}
+					</code></pre>
+				</section>
+
+				<section>
+          <h2>Jbuilder kullanım örnekleri</h2>
+            <pre><code data-trim>
+...
+render json: @user.as_json(
+  only: [:email], 
+  methods: [:name], 
+  include: {
+    posts: {
+      only: [:title],
+      include: {
+        comments: {
+          only: [:content] 
+        }
+      } 
+    }
+  }
+)
+...
+            </code></pre>
+          <p>VS</p>
+					<pre><code data-trim contenteditable>
+json.name "#{@user.first_name} #{user.last_name}"
+json.email @user.email
+json.posts @user.posts do |post|
+  json.title post.title
+  json.comments post.comments do |comment|
+    json.content comment.content
+  end
+end
+
+					</code></pre>
+				</section>
+
+				<section>
+          <section>
+            <pre><code data-trim>
+json.array! @users, :id, :name
+
+# => [ { "id": 1, "name": "Zafer" }, { "id": 2, "name": "Destan" } ]
+            </code></pre>
+          </section>
+          <section>
+            <pre><code data-trim>
+json.array! @users, :id, :name
+
+# => [ { "id": 1, "name": "Zafer" }, { "id": 2, "name": "Destan" } ]
+            </code></pre>
+          </section>
+				</section>
+
+<section>
+	<section>
+	<p>Partial desteği</p>
+            <pre><code data-trim>
+json.array!(@users) do |user|
+  json.partial! 'user', user: user
+end
+            </code></pre>
+
+<pre><code data-trim>
+json.extract! user, :first_name, :last_name
+            </code></pre>
+          </section>
+				</section>
+
+        <section>
+          <section>
+<p>Cache desteği</p>
+            <pre><code data-trim>
+json.array!(users) do |user|
+    json.name user.name
+    json.email user.email
+end
+            </code></pre>
+          </section>
+          <section>
+            <pre><code data-trim>
+json.array!(users) do |user|
+  json.cache! user do
+    json.name user.name
+    json.email user.email
+  end
+end
+            </code></pre>
+          </section>
+				</section>
+
+				<section>
+					<h2>Sorular??</h2>
+				</section>
+
+        <section>
+          <p>zafer@kodgemisi.com</p>
+          <p>@xaphtrick</p>
+        </section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>Tek Sayfa Uygulamalarda SEO || OWTG 2013</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/night.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h2>Tek Sayfa Uygulamalarda SEO</h2>
+					<!--<h4>Bir DSL olarak Jbuilder</h4>-->
+					<p>
+						<small><a href="http://dorukdestan.com">Destan Sarpkaya</a> / <a href="http://twitter.com/xaphtrick">@dorukdestan</a></small>
+					</p>
+					<p>
+						<small><a href="http://blog.yorgunpenguen.com">Zafer Cakmak</a> / <a href="http://twitter.com/xaphtrick">@xaphtrick</a></small>
+					</p>
+				</section>
+
+       <section>
+          <h2>Biz Kimiz?</h2>
+          <p>
+            <a href="http://www.kodgemisi.com">KodGemisi'nin Tayfası</a><br>
+            <p>
+              Özgür Yazılım Destekçileri
+            </p>
+          </p>
+          <div id="kodgemisi-logo">
+            <img src="kodgemisi.png" alt="kodgemisi" style="background: none !important; border:none !important;">
+          </div>
+        </section>
+
+				<section>
+					<h2>Neler Anlatacağız?</h2>
+					<ul>
+						<li>Arama motoru nedir?</li>
+						<li>Tek sayfa uygulama nedir?</li>
+						<li>Tek sayfa uygulamalarda arama motoru problemleri</li>
+						<li>Çözümler</li>
+						<li>Soru & Cevap</li>
+					</ul>
+				</section>
+
+		<section>
+            <h2>Arama motoru nedir?</h2>
+            <p>
+              Web'i tarayan(Crawler) ve indexleyen bir sistemdir
+            <p>
+              Crawler: Sayfanızı satır satır okuyan(HTML) bir scripttir
+            </p>
+            <p>
+              Crawler: Çat kapı gelen bir ziyaretçidir
+            </p>
+          </section>
+		  <section>
+            <h2>Arama motoru nedir?</h2>
+            <p>
+              Aldığı veriyi anlamlandırır. Veri önemli!
+            </p>
+        	<p>
+              Anlamlandırdığı veriyi indeksler, isteyene sunar.
+            </p>
+          </section>
+        
+  		  <section>
+ 			<h2>Tek sayfa uygulama nedir?</h2>
+			<p>Tek bir sayfadan sunulan uygulamalardır</p>
+		  	<p>Sayfa yeniden yüklenmez</p>
+		  	<p>Backend'den gelen data dom manipülasyonu ile yerleştirilir</p>
+		  	<p>Amaç: JS performansı > Sayfayı yeniden yükleme hızı</p>
+		  </section>
+
+		  <section>
+ 			<h2>Problemler</h2>
+ 			<p class="fragment">
+            	Crawler HTML'den anlar, elimizde bir tane var
+			</p>
+			<p class="fragment">
+				HTML bizim için dinamik, Crawler için statik 
+			</p>
+		  </section>
+		  
+		  <section>
+ 			<h2>Tek sayfa uygulama vs Arama motoru</h2>
+ 			<pre><code>
+<div class="sb">
+  <ul class="scoreboard" ng-controller="soccer.ctrl.main">
+    <li ng-repeat="match in widgetMatches | filter:widgetContentCurrentId" ng-animate="{enter:'animated fadeIn',leave:'animated fadeOut'}" ng-cloak>
+      <div class="sur">{{soccerCtrlHelper.calculateTimeForWidget(match)}}</div>
+      <div class="v1_team">{{match.home_name}}</div>
+      <div class="s1">{{soccerCtrlHelper.homeScore(match)}}</div>
+      <div class="s2">{{soccerCtrlHelper.awayScore(match)}}</div>
+      <div class="v2_team">{{match.away_name}}</div>
+   </li>
+  </ul>
+</div>
+ 			</code></pre>
+ 			VS
+			<pre><code> 			
+<div class="sb">
+  <ul class="scoreboard ng-scope" ng-controller="soccer.ctrl.main">
+    <!-- ngRepeat: match in widgetMatches | filter:widgetContentCurrentId --><li ng-repeat="match in widgetMatches | filter:widgetContentCurrentId" ng-animate="{enter:'animated fadeIn',leave:'animated fadeOut'}" class="ng-scope animated fadeIn">
+      <div class="sur ng-binding">19:30</div>
+      <div class="v1_team ng-binding">B.Dortmund</div>
+      <div class="s1 ng-binding">-</div>
+      <div class="s2 ng-binding">-</div>
+      <div class="v2_team ng-binding">B.Münih</div>
+   </li>
+   ...
+  </ul>
+</div>
+ 			</code></pre>
+
+		  </section>
+
+		  <section>
+					<h2>Çözümler</h2>
+					<p class="fragment">
+            Hashbang(#!) ile crawlerı yönlendirmek
+					</p>
+					<ul>
+						<li class="fragment">
+							Crawler sayfayı ister -> hede.com/#!sayfa/3
+						</li>
+						<li class="fragment">
+							Crawler sayfayı escaped fragment ile tekrar ister -> hede.com/?_escaped_fragment_=sayfa/3
+						</li>
+						
+						<li class="fragment">
+							escaped fragment ile gelen sayfayı prerender edip veriririz
+						</li>
+					</ul>
+		 </section>
+
+		  <section>
+					<h2>Çözümler</h2>
+					<p class="fragment">
+            _escaped_fragment_ a göre içerik vermek
+					</p>
+					<ul>
+						<li class="fragment">
+							Sunucu konfigürasyonu ile yönlendirme yaparız
+						</li>
+						<li class="fragment">
+							Crawler sayfayı escaped fragment ile tekrar ister -> hede.com/?_escaped_fragment_=sayfa/3
+						</li>
+						
+						<li class="fragment">
+							escaped fragment ile gelen sayfayı prerendered HTML veriririz
+						</li>
+						
+						<li class="fragment">
+							Headless browser(PhantomJS, crawler) kullanıp prerender edebiliriz
+						</li>
+					</ul>
+					<p class="fragment">Hashbang kullanıp, ufak js işlemleriniz olduğu durumda ideal çözüm</p>	
+		 </section>
+		 <section>
+					<h2>Çözümler</h2>
+					<p>Prerendered HTML'i önceden hazırlamak</p>
+					<ul>
+						<li class="fragment">
+							Cron ile günlük/haftalık snapshotlar üretebilirsiniz
+						</li>
+						<li class="fragment">
+							Gelen crawler'ı statik sayfaya yönlendirebilirsiniz 
+						</li>
+					</ul>
+					<p class="fragment">Hashbang ve ağır js kullanmadığınız durumda ideal çözüm</p>	
+		 </section>
+		 
+		         
+				<section>
+					<h2>Sorular??</h2>
+					<p>destan@kodgemisi.com</p>
+					<p>zafer@kodgemisi.com</p>
+				</section>
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
